@@ -57,33 +57,33 @@ def new_user():
 
     return redirect('/users')
 
-@app.get('/users/<int:user_id>')
-def user_detail(user_id):
+@app.get('/users/<int:id>')
+def user_detail(id):
     """ Display user detail """
 
-    user = User.query.get_or_404(user_id)
-    posts = Post.query.all()
+    user = User.query.get_or_404(id)
+    posts = user.posts
 
     return render_template('users/detail.html',
                            user=user,
                            posts=posts)
 
 
-@app.get('/users/<int:user_id>/edit')
-def user_detail_edit(user_id):
+@app.get('/users/<int:id>/edit')
+def user_detail_edit(id):
     """ Display edit page for a user """
 
-    user = User.query.get_or_404(user_id)
+    user = User.query.get_or_404(id)
 
     return render_template('users/edit.html',
                            user=user)
 
 
-@app.post('/users/<int:user_id>/edit')
-def user_detail_update(user_id):
+@app.post('/users/<int:id>/edit')
+def user_detail_update(id):
     """Process the edit form, redirect user to /users"""
 
-    user = User.query.get_or_404(user_id)
+    user = User.query.get_or_404(id)
     user.first_name = request.form['fname_input']
     user.last_name = request.form['lname_input']
     user.image_url = request.form['image_input']
@@ -95,11 +95,11 @@ def user_detail_update(user_id):
 
 
 
-@app.post('/users/<int:user_id>/delete')
-def delete_user(user_id):
+@app.post('/users/<int:id>/delete')
+def delete_user(id):
     """ Delete existing user """
 
-    user = User.query.get_or_404(user_id)
+    user = User.query.get_or_404(id)
 
     db.session.delete(user)
     db.session.commit()
@@ -108,10 +108,27 @@ def delete_user(user_id):
 
 # Post Routes
 
-@app.get("/users/<int:user_id>/posts/new")
-def new_post_form(user_id):
+@app.get("/users/<int:id>/posts/new")
+def new_post_form(id):
     """Go to new post form"""
 
-    user = User.query.get_or_404(user_id)
+    user = User.query.get_or_404(id)
 
-    return render_template('new_post_form.html', user = user)
+    return render_template('posts/new_post_form.html', user = user)
+
+@app.post("/users/<int:id>/posts/new")
+def user_post(id):
+    """ Display user post """
+    user = User.query.get_or_404(id)
+
+    title_input = request.form['title_input']
+    content_input = request.form['content_input']
+
+    post = Post(
+        title = title_input,
+        content = content_input,
+        user_id = id
+    )
+    return render_template('posts/post.html',
+                           user=user,
+                           post=post)

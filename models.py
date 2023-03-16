@@ -39,6 +39,9 @@ class User(db.Model):
         default="https://t4.ftcdn.net/jpg/03/46/93/61/360_F_346936114_RaxE6OQogebgAWTalE1myseY1Hbb5qPM.jpg"
     )
 
+    # posts
+    posts = db.relationship('Post', backref='user')
+
 class Post(db.Model):
     """Posts for Blogly"""
 
@@ -66,7 +69,7 @@ class Post(db.Model):
         nullable=False,
     )
 
-    user_id = db.Column(
+    user_id= db.Column(
         db.Integer,
-        db.ForeignKey('users.id')
+        db.ForeignKey("users.id")
     )

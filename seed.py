@@ -14,9 +14,12 @@ db.session.add(user1)
 db.session.add(user2)
 db.session.add(user3)
 
+# commit users
+db.session.commit()
+
 # Add new posts
-post1 = Post(title='A cool title', content= 'A cool article')
-post2 = Post(title='A lame title', content= 'A lame article')
+post1 = Post(title='A cool title', content= 'A cool article', user_id=user1.id)
+post2 = Post(title='A lame title', content= 'A lame article', user_id=user1.id)
 
 # Add posts to session
 db.session.add(post1)

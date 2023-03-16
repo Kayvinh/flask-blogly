@@ -4,12 +4,14 @@ db = SQLAlchemy()
 
 def connect_db(app):
     """ Connect to database. """
+    
     app.app_context().push()
     db.app = app
     db.init_app(app)
 
-"""Models for Blogly."""
 class User(db.Model):
+    """Models for Blogly."""
+
     __tablename__ = "users"
 
     id = db.Column(
@@ -31,6 +33,6 @@ class User(db.Model):
     image_url = db.Column(
         db.String(200),
         nullable=True,
-        default="http://cdn.shopify.com/s/files/1/1061/1924/products/Emoji_Icon_-_Clown_emoji_grande.png?v=1571606089"
+        default="https://t4.ftcdn.net/jpg/03/46/93/61/360_F_346936114_RaxE6OQogebgAWTalE1myseY1Hbb5qPM.jpg"
     )
 

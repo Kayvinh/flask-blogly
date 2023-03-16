@@ -26,14 +26,14 @@ def list_of_users():
     """ List users and has add user form """
 
     users = User.query.all()
-    return render_template('users.html',users=users)
+    return render_template('users/users.html',users=users)
 
 
 @app.get('/users/new')
 def new_user_form():
     """ Form for new user """
 
-    return render_template('new_user_form.html')
+    return render_template('users/new_user_form.html')
 
 
 @app.post('/users/new')
@@ -63,7 +63,7 @@ def user_detail(user_id):
 
     user = User.query.get_or_404(user_id)
 
-    return render_template('detail.html',
+    return render_template('users/detail.html',
                            user=user)
 
 
@@ -73,7 +73,7 @@ def user_detail_edit(user_id):
 
     user = User.query.get_or_404(user_id)
 
-    return render_template('edit.html',
+    return render_template('users/edit.html',
                            user=user)
 
 

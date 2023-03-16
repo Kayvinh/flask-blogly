@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect
 from flask_debugtoolbar import DebugToolbarExtension
-from models import User, db, connect_db
+from models import User, db, connect_db, Post
 
 
 app = Flask(__name__)
@@ -47,11 +47,11 @@ def new_user():
     # if empty is None
     new_user = User(
         first_name = fname_input,
-        last_name = lname_input, 
+        last_name = lname_input,
         image_url = image_input
     )
-    
-    
+
+
     db.session.add(new_user)
     db.session.commit()
 
@@ -62,9 +62,11 @@ def user_detail(user_id):
     """ Display user detail """
 
     user = User.query.get_or_404(user_id)
+    posts = Post.query.all()
 
     return render_template('users/detail.html',
-                           user=user)
+                           user=user,
+                           posts=posts)
 
 
 @app.get('/users/<int:user_id>/edit')
@@ -103,3 +105,13 @@ def delete_user(user_id):
     db.session.commit()
 
     return redirect('/users')
+
+# Post Routes
+
+@app.get("/users/<int:user_id>/posts/new")
+def new_post_form(user_id):
+    """Go to new post form"""
+
+    user = User.query.get_or_404(user_id)
+
+    return render_template('new_post_form.html', user = user)

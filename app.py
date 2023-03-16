@@ -108,6 +108,11 @@ def delete_user(id):
 
 # Post Routes
 
+
+
+
+
+
 @app.get("/users/<int:id>/posts/new")
 def new_post_form(id):
     """Go to new post form"""
@@ -132,3 +137,27 @@ def user_post(id):
     return render_template('posts/post.html',
                            user=user,
                            post=post)
+
+@app.get("/posts/<int:id>")
+def show_post_details(id):
+    """Show post details"""
+    # user = User.query.get_or_404(id)
+    # post = Post.query.filter(Post.id==id).one()
+    # user = post.user_id
+    # user_info = User.query.filter_by(id=user).one()
+    post = Post.query.get_or_404(id)
+
+    return render_template("posts/post_detail.html", post=post)
+
+
+
+@app.get("/posts/<int:id>/edit")
+def edit_post(id):
+    """Display edit post form """
+
+    # user = User.query.get_or_404(id)
+    # posts = user.posts
+    post = Post.query.get_or_404(id)
+
+
+    return render_template('posts/edit_post.html', post=post)

@@ -3,6 +3,8 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
+DEFAULT_IMAGE_URL = "https://cdn.shopify.com/s/files/1/1061/1924/products/Emoji_Icon_-_Clown_emoji_grande.png?v=1571606089"
+
 def connect_db(app):
     """ Connect to database. """
 
@@ -32,14 +34,12 @@ class User(db.Model):
     )
 
     image_url = db.Column(
-        # change data type to text not string
-        db.String(200),
-        # dont allow nullable
-        nullable=True,
-        default="https://t4.ftcdn.net/jpg/03/46/93/61/360_F_346936114_RaxE6OQogebgAWTalE1myseY1Hbb5qPM.jpg"
+        db.Text,
+        nullable=False,
+        default=DEFAULT_IMAGE_URL
     )
 
-    # posts
+    # direct navigation: User -> Post & back
     posts = db.relationship('Post', backref='user')
 
 class Post(db.Model):

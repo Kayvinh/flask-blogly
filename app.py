@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect
 from flask_debugtoolbar import DebugToolbarExtension
-from models import User, db, connect_db, Post
+from models import User, db, connect_db, Post, DEFAULT_IMAGE_URL
 
 
 app = Flask(__name__)
@@ -15,6 +15,7 @@ connect_db(app)
 
 debug = DebugToolbarExtension(app)
 
+
 @app.get('/')
 def home():
     """ redirect to /users """
@@ -26,7 +27,7 @@ def list_of_users():
     """ List users and has add user form """
 
     users = User.query.all()
-    return render_template('users/users.html',users=users)
+    return render_template('users/users.html', users=users)
 
 
 @app.get('/users/new')
@@ -42,20 +43,22 @@ def new_user():
 
     fname_input = request.form['fname_input']
     lname_input = request.form['lname_input']
-    image_input = request.form['image_input']       # if empty string, passes in empty string
+    image_input = request.form['image_input']
 
-    # if empty is None
+    if image_input is not None:
+        image_input = DEFAULT_IMAGE_URL
+
     new_user = User(
-        first_name = fname_input,
-        last_name = lname_input,
-        image_url = image_input
+        first_name=fname_input,
+        last_name=lname_input,
+        image_url=image_input
     )
-
 
     db.session.add(new_user)
     db.session.commit()
 
     return redirect('/users')
+
 
 @app.get('/users/<int:id>')
 def user_detail(id):
@@ -64,9 +67,11 @@ def user_detail(id):
     user = User.query.get_or_404(id)
     posts = user.posts
 
-    return render_template('users/detail.html',
-                           user=user,
-                           posts=posts)
+    return render_template(
+        'users/detail.html',
+        user=user,
+        posts=posts
+    )
 
 
 @app.get('/users/<int:id>/edit')
@@ -75,8 +80,7 @@ def user_detail_edit(id):
 
     user = User.query.get_or_404(id)
 
-    return render_template('users/edit.html',
-                           user=user)
+    return render_template('users/edit.html', user=user)
 
 
 @app.post('/users/<int:id>/edit')
@@ -94,7 +98,6 @@ def user_detail_update(id):
     return redirect('/users')
 
 
-
 @app.post('/users/<int:id>/delete')
 def delete_user(id):
     """ Delete existing user """
@@ -109,38 +112,46 @@ def delete_user(id):
 # Post Routes
 
 
-
-
-
-
 @app.get("/users/<int:id>/posts/new")
 def new_post_form(id):
+    #TODO: change docsstring
     """Go to new post form"""
 
     user = User.query.get_or_404(id)
 
-    return render_template('posts/new_post_form.html', user = user)
+    return render_template('posts/new_post_form.html', user=user)
+
 
 @app.post("/users/<int:id>/posts/new")
 def user_post(id):
+    #TODO: change docstring
     """ Display user post """
+
     user = User.query.get_or_404(id)
 
-    title_input = request.form['title_input']
-    content_input = request.form['content_input']
+    title = request.form['title']
+    content = request.form['content']
 
     post = Post(
-        title = title_input,
-        content = content_input,
-        user_id = id
+        title=title,
+        content=content,
+        user_id=id
     )
-    return render_template('posts/post.html',
-                           user=user,
-                           post=post)
+
+    db.session.add(post)
+    db.session.commit()
+
+    return render_template(
+        'posts/post.html',
+        user=user,
+        post=post
+    )
+
 
 @app.get("/posts/<int:id>")
 def show_post_details(id):
     """Show post details"""
+
     # user = User.query.get_or_404(id)
     # post = Post.query.filter(Post.id==id).one()
     # user = post.user_id
@@ -150,14 +161,36 @@ def show_post_details(id):
     return render_template("posts/post_detail.html", post=post)
 
 
-
 @app.get("/posts/<int:id>/edit")
 def edit_post(id):
     """Display edit post form """
 
-    # user = User.query.get_or_404(id)
-    # posts = user.posts
     post = Post.query.get_or_404(id)
 
-
     return render_template('posts/edit_post.html', post=post)
+
+
+@app.post("/posts/<int:id>/edit")
+def post_update(id):
+    """ Handle edit post """
+
+    post = Post.query.get_or_404(id)
+    #TODO: change name title_input
+    post.title = request.form['title']
+    post.content = request.form['content']
+
+    db.session.commit()
+
+    return redirect(f'/posts/{id}')
+
+
+@app.post("/posts/<int:id>/delete")
+def delete_post(id):
+    """ Handle delete post """
+
+    post = Post.query.get_or_404(id)
+
+    db.session.delete(post)
+    db.session.commit()
+
+    return redirect(f'/users/{post.user_id}')
